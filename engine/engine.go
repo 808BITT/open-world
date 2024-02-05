@@ -2,14 +2,14 @@ package engine
 
 import (
 	"embed"
+	"image/color"
 	"log"
 
 	"github.com/808bitt/open-world/entity"
 	"github.com/808bitt/open-world/input"
-	"github.com/808bitt/open-world/util"
 	"github.com/808bitt/open-world/world"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type Engine struct {
@@ -33,7 +33,7 @@ func NewEngine(assets *embed.FS) *Engine {
 		World:     world.NewWorld2D(screenWidth, screenHeight, gridSize, assets),
 		Player:    entity.NewPlayer(screenWidth/2, screenHeight/2, 1, assets),
 		Mouse:     input.NewMouseInput(),
-		TimeOfDay: 0,
+		TimeOfDay: 30000,
 	}
 }
 
@@ -62,8 +62,24 @@ func (e *Engine) Update() error {
 func (e *Engine) Draw(screen *ebiten.Image) {
 	// Draw game state
 	e.World.Draw(screen, e.TimeOfDay)
+	if e.TimeOfDay > 20000 {
+		if e.TimeOfDay <= 30000 {
+			shadow := float64(e.TimeOfDay-20000) / 10000 * 150
+			flashlight := shadow / 10
+			vector.DrawFilledRect(screen, 0, 0, float32(e.World.Width*e.World.GridSize), float32(e.World.Height*e.World.GridSize), color.RGBA{0, 0, 0, uint8(shadow)}, true)
+			vector.DrawFilledCircle(screen, float32(e.Player.X), float32(e.Player.Y), 50, color.RGBA{uint8(flashlight), uint8(flashlight), uint8(flashlight), 1}, true)
+		} else {
+			shadow := float64(40000-e.TimeOfDay) / 10000 * 150
+			flashlight := shadow / 10
+			vector.DrawFilledRect(screen, 0, 0, float32(e.World.Width*e.World.GridSize), float32(e.World.Height*e.World.GridSize), color.RGBA{0, 0, 0, uint8(shadow)}, true)
+			vector.DrawFilledCircle(screen, float32(e.Player.X), float32(e.Player.Y), 50, color.RGBA{uint8(flashlight), uint8(flashlight), uint8(flashlight), 1}, true)
+		}
+	}
 	e.Player.Draw(screen)
-	ebitenutil.DebugPrint(screen, util.Itoa(int(float64(24*e.TimeOfDay/40000)))+"h")
+
+	// Draw a simulated light source
+
+	// ebitenutil.DebugPrint(screen, util.Itoa((int(float64(24*e.TimeOfDay/40000))+6)%24)+"h")
 }
 
 func (e *Engine) Layout(outsideWidth, outsideHeight int) (int, int) {

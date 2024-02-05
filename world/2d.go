@@ -2,15 +2,12 @@ package world
 
 import (
 	"embed"
-	"image/color"
-	"log"
 
 	"github.com/808bitt/open-world/entity"
 	"github.com/808bitt/open-world/input"
 	"github.com/808bitt/open-world/tilemap"
 	"github.com/808bitt/open-world/util"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type World2D struct {
@@ -31,19 +28,6 @@ func NewWorld2D(width, height, gridSize int, assets *embed.FS) *World2D {
 
 func (w *World2D) Draw(screen *ebiten.Image, timeOfDay int) {
 	w.TileMap.Draw(screen)
-
-	if timeOfDay > 20000 {
-		if timeOfDay <= 30000 {
-			log.Println("Pre: ", float64(timeOfDay-20000)/10000)
-			shadow := float64(timeOfDay-20000) / 10000 * 100
-			vector.DrawFilledRect(screen, 0, 0, float32(w.Width*w.GridSize), float32(w.Height*w.GridSize), color.RGBA{0, 0, 0, uint8(shadow)}, true)
-			log.Println("Shadow: ", shadow)
-		} else {
-			shadow := float64((40000-timeOfDay)/10000) * 100
-			vector.DrawFilledRect(screen, 0, 0, float32(w.Width*w.GridSize), float32(w.Height*w.GridSize), color.RGBA{0, 0, 0, uint8(shadow)}, true)
-			log.Println("Shadow: ", shadow)
-		}
-	}
 }
 
 func (w *World2D) Update(mouse *input.MouseInput, player *entity.Player) {
@@ -100,7 +84,7 @@ func (w *World2D) Update(mouse *input.MouseInput, player *entity.Player) {
 			}
 		}
 	}
-	if mouse.RightClick {
+	if mouse.RightPressed {
 		mX, mY := w.TileAt(mouse.X, mouse.Y)
 		w.TileMap.SetTile(mX, mY, tilemap.NewTile(tilemap.GrassTile, mX, mY, w.TileMap.GrassTile, true))
 	}

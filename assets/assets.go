@@ -6,7 +6,7 @@ import (
 
 //go:embed player/standing/*.png
 //go:embed player/walking/*.png
-//go:embed tiles/*.png
+//go:embed tile/*.png
 //go:embed wall/*.png
 var Assets embed.FS
 

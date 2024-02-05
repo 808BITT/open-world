@@ -2,12 +2,9 @@ package entity
 
 import (
 	"embed"
-	"image/color"
 
 	"github.com/808bitt/open-world/util"
-	"github.com/808bitt/open-world/world"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type Player struct {
@@ -65,29 +62,8 @@ func NewPlayer(x, y, moveSpeed int, assets *embed.FS) *Player {
 	}
 }
 
-func (p *Player) Update(world *world.World2D) {
-	p.Walking = false
-	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyUp) {
-		p.WalkUp(world)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyS) || ebiten.IsKeyPressed(ebiten.KeyDown) {
-		p.WalkDown(world)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyA) || ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		p.WalkLeft(world)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) || ebiten.IsKeyPressed(ebiten.KeyRight) {
-		p.WalkRight(world)
-	}
+func (p *Player) Update() {
 
-	if p.Walking {
-		p.SprIndex++
-		if p.SprIndex >= len(p.SprWalkingDown)*10 {
-			p.SprIndex = 0
-		}
-		return
-	}
-	p.SprIndex = 0
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
@@ -137,10 +113,6 @@ func (p *Player) Draw(screen *ebiten.Image) {
 		screen.DrawImage(p.SprStandingRight, op)
 		return
 	}
-
-	// Draw player hitbox
-	x, y, w, h := p.Hitbox()
-	vector.DrawFilledRect(screen, float32(x), float32(y), float32(w), float32(h), color.RGBA{255, 0, 0, 255}, true)
 }
 
 func (p *Player) Hitbox() (int, int, int, int) {
@@ -152,42 +124,22 @@ func (p *Player) Move(dx, dy int) {
 	p.Y += dy * p.MoveSpeed
 }
 
-func (p *Player) WalkUp(w *world.World2D) {
-	p.Direction = util.Up.Int()
-	northBorder := w.GridSize * 3
-	if p.Y-p.MoveSpeed < northBorder {
-		return
-	}
+func (p *Player) WalkUp() {
 	p.Walking = true
 	p.Move(0, -1)
 }
 
-func (p *Player) WalkDown(w *world.World2D) {
-	p.Direction = util.Down.Int()
-	southBorder := w.Height*w.GridSize - w.GridSize*2 - 4
-	if p.Y+p.MoveSpeed > southBorder {
-		return
-	}
+func (p *Player) WalkDown() {
 	p.Walking = true
 	p.Move(0, 1)
 }
 
-func (p *Player) WalkLeft(w *world.World2D) {
-	p.Direction = util.Left.Int()
-	westBorder := w.GridSize*2 + 8
-	if p.X-p.MoveSpeed < westBorder {
-		return
-	}
+func (p *Player) WalkLeft() {
 	p.Walking = true
 	p.Move(-1, 0)
 }
 
-func (p *Player) WalkRight(w *world.World2D) {
-	p.Direction = util.Right.Int()
-	eastBorder := w.Width*w.GridSize - w.GridSize*2 - 8
-	if p.X+p.MoveSpeed > eastBorder {
-		return
-	}
+func (p *Player) WalkRight() {
 	p.Walking = true
 	p.Move(1, 0)
 }

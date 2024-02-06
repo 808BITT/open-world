@@ -4,6 +4,7 @@ import (
 	"log"
 	"open-world/assets"
 	"open-world/settings"
+	"open-world/util"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -43,7 +44,28 @@ func (e *Engine) Update() error {
 }
 
 func (e *Engine) Draw(screen *ebiten.Image) {
-	// draw an isometric grid
+
+	isoGrass := util.LoadImage(e.Assets, "test/iso_grass.png")
+	width, height := 64, 64
+
+	for x := 0; x < e.Settings.Screen.Width/width; x++ {
+		for y := 0; y < e.Settings.Screen.Width/width; y++ {
+			opts := &ebiten.DrawImageOptions{}
+			xOffset, yOffset := util.GridToIsometric(x, y, width, height, e.Settings.Screen.Width)
+			opts.GeoM.Translate(float64(xOffset), float64(yOffset))
+			screen.DrawImage(isoGrass, opts)
+		}
+	}
+
+	mX, mY := ebiten.CursorPosition()
+	x, y := util.IsoToGrid(mX, mY, width, height, e.Settings.Screen.Width)
+	log.Println(x, y)
+
+	highlight := util.LoadImage(e.Assets, "test/highlight2.png")
+	opts := &ebiten.DrawImageOptions{}
+	xOffset, yOffset := util.GridToIsometric(x, y, width, height, e.Settings.Screen.Width)
+	opts.GeoM.Translate(float64(xOffset), float64(yOffset))
+	screen.DrawImage(highlight, opts)
 }
 
 func (e *Engine) Layout(outsideWidth, outsideHeight int) (int, int) {

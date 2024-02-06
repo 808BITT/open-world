@@ -4,12 +4,17 @@ import (
 	"embed"
 )
 
-//go:embed player/standing/*.png
-//go:embed player/walking/*.png
+type Assets struct {
+	embed.FS
+}
+
 //go:embed tile/*.png
 //go:embed wall/*.png
-var Assets embed.FS
+//go:embed player/standing/*.png
+//go:embed player/walking/*.png
+//go:embed test/*.png
+var files embed.FS
 
-func EmbedAssets() embed.FS {
-	return Assets
+func EmbedAssets() *Assets {
+	return &Assets{files}
 }

@@ -1,9 +1,9 @@
 package entity
 
 import (
-	"embed"
+	"open-world/assets"
+	"open-world/util"
 
-	"github.com/808bitt/open-world/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -23,7 +23,7 @@ type Player struct {
 	SprWalkingUp     []*ebiten.Image
 }
 
-func NewPlayer(x, y, moveSpeed int, assets *embed.FS) *Player {
+func NewPlayer(x, y, moveSpeed int, assets *assets.Assets) *Player {
 	return &Player{
 		X:                x,
 		Y:                y,

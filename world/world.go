@@ -1,12 +1,12 @@
 package world
 
 import (
-	"embed"
+	"open-world/assets"
+	"open-world/entity"
+	"open-world/input"
+	"open-world/tilemap"
+	"open-world/util"
 
-	"github.com/808bitt/open-world/entity"
-	"github.com/808bitt/open-world/input"
-	"github.com/808bitt/open-world/tilemap"
-	"github.com/808bitt/open-world/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -17,7 +17,7 @@ type World2D struct {
 	TileMap  *tilemap.TileMap
 }
 
-func NewWorld2D(width, height, gridSize int, assets *embed.FS) *World2D {
+func NewWorld2D(width, height, gridSize int, assets *assets.Assets) *World2D {
 	return &World2D{
 		Width:    width / gridSize,
 		Height:   height / gridSize,

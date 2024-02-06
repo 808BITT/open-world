@@ -1,10 +1,11 @@
 package tilemap
 
 import (
-	"embed"
 	"image/color"
 
-	"github.com/808bitt/open-world/util"
+	"open-world/assets"
+	"open-world/util"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
@@ -27,7 +28,7 @@ type TileMap struct {
 	WallBotLeft   *ebiten.Image
 }
 
-func NewTileMap(width, height, gridSize int, assets *embed.FS) *TileMap {
+func NewTileMap(width, height, gridSize int, assets *assets.Assets) *TileMap {
 	tiles := make([][]*Tile, width/gridSize)
 	for i := range tiles {
 		tiles[i] = make([]*Tile, height/gridSize)

@@ -1,14 +1,14 @@
 package util
 
 import (
-	"embed"
 	"image/png"
 	"log"
+	"open-world/assets"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func LoadImage(assets *embed.FS, path string) *ebiten.Image {
+func LoadImage(assets *assets.Assets, path string) *ebiten.Image {
 	f, err := assets.Open(path)
 	if err != nil {
 		log.Fatal(err)

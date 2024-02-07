@@ -12,6 +12,7 @@ import (
 type Engine struct {
 	Settings *settings.EngineSettings
 	Assets   *assets.Assets
+	IgMap    *util.GridMap
 }
 
 func init() {
@@ -30,6 +31,7 @@ func NewEngine() *Engine {
 	return &Engine{
 		Settings: s,
 		Assets:   a,
+		IgMap:    nil,
 	}
 }
 
@@ -39,54 +41,32 @@ func (e *Engine) Run() {
 	}
 }
 
-type Point struct {
-	X, Y int
-}
-
 func (e *Engine) Update() error {
-	// tileImg := util.LoadImage(assets.EmbedAssets(), "test/iso_grass.png")
-	// tileShape := make([]Point, 0)
-	// for x := 0; x < 64; x++ {
-	// 	for y := 0; y < 64; y++ {
-	// 		_, _, _, a := tileImg.At(x, y).RGBA()
-	// 		if a == 0 {
-	// 			continue
-	// 		}
-	// 		tileShape = append(tileShape, Point{x, y})
-	// 	}
-	// }
+	if e.IgMap == nil {
+		tileImg := util.LoadImage(e.Assets, "test/tile_top.png")
+		tileShape := make([]util.Point, 0)
+		for x := 0; x < tileImg.Bounds().Dx(); x++ {
+			for y := 0; y < tileImg.Bounds().Dy(); y++ {
+				_, _, _, a := tileImg.At(x, y).RGBA()
+				if a == 0 {
+					continue
+				}
+				tileShape = append(tileShape, util.Point{X: x, Y: y})
+			}
+		}
 
-	// // for y := 0; y < 25; y++ {
-	// // 	for x := 0; x < 25; x++ {
-
-	// x, y := 0, 0
-	// isoX, isoY := util.GridToIso(x, y, 64, 64, 1920)
-	// fmt.Println(x, y, isoX, isoY)
-	// for _, p := range tileShape {
-	// 	fmt.Println("Checking: ", p.X, p.Y)
-	// 	// check isoX+p.X, isoY+p.Y to see if it maps back to x, y
-	// 	// if it doesnt, panic
-
-	// 	gridX, gridY := util.IsoToGrid(isoX+p.X, isoY+p.Y, 64, 64, 1920)
-	// 	if gridX != x || gridY != y {
-	// 		log.Println("Mismatch", x, y, gridX, gridY)
-	// 		os.Exit(1)
-	// 	}
-	// }
-	// // 	}
-	// // }
-	//
-	// os.Exit(0)
+		gridMap := util.NewGridMap(tileShape, e.Settings.Grid.Width, e.Settings.Grid.Height, 64, 64, e.Settings.Screen.Width, e.Assets)
+		e.IgMap = gridMap
+	}
 	return nil
 }
 
 func (e *Engine) Draw(screen *ebiten.Image) {
-
 	isoGrass := util.LoadImage(e.Assets, "test/iso_grass.png")
 	width, height := 64, 64
 
-	for x := 0; x < 25; x++ {
-		for y := 0; y < 25; y++ {
+	for x := 0; x < e.Settings.Grid.Width; x++ {
+		for y := 0; y < e.Settings.Grid.Height; y++ {
 			opts := &ebiten.DrawImageOptions{}
 			xOffset, yOffset := util.GridToIso(x, y, width, height, e.Settings.Screen.Width)
 			opts.GeoM.Translate(float64(xOffset), float64(yOffset))
@@ -95,13 +75,15 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	}
 
 	mX, mY := ebiten.CursorPosition()
-	x, y := util.IsoToGrid(mX, mY, width, height, e.Settings.Screen.Width)
-
-	highlight := util.LoadImage(e.Assets, "test/highlight2.png")
-	opts := &ebiten.DrawImageOptions{}
-	xOffset, yOffset := util.GridToIso(x, y, width, height, e.Settings.Screen.Width)
-	opts.GeoM.Translate(float64(xOffset), float64(yOffset))
-	screen.DrawImage(highlight, opts)
+	lookup := util.IsoPoint{P: util.Point{X: mX, Y: mY}}
+	gridPoint, ok := (*e.IgMap.Lookup)[lookup]
+	if ok {
+		highlight := util.LoadImage(e.Assets, "test/tile_top.png")
+		opts := &ebiten.DrawImageOptions{}
+		xOffset, yOffset := util.GridToIso(gridPoint.P.X, gridPoint.P.Y, width, height, e.Settings.Screen.Width)
+		opts.GeoM.Translate(float64(xOffset), float64(yOffset))
+		screen.DrawImage(highlight, opts)
+	}
 }
 
 func (e *Engine) Layout(outsideWidth, outsideHeight int) (int, int) {

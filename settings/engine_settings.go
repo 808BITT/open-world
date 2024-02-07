@@ -7,6 +7,7 @@ import (
 
 type EngineSettings struct {
 	Screen *ScreenSettings
+	Grid   *GridSettings
 }
 
 func Load() (*EngineSettings, error) {

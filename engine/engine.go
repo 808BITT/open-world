@@ -64,7 +64,7 @@ func (e *Engine) Update() error {
 func (e *Engine) Draw(screen *ebiten.Image) {
 	isoTest := util.LoadImage(e.Assets, "test/iso_test.png")
 
-	for z := 0; z < 3; z++ {
+	for z := 0; z < e.Settings.Grid.MaxZ; z++ {
 		for x := 0; x < e.Settings.Grid.Width; x++ {
 			for y := 0; y < e.Settings.Grid.Height; y++ {
 				opts := &ebiten.DrawImageOptions{}
